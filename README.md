@@ -2,11 +2,13 @@
 Sudoku Solver Backtracking Development (From Recursive to Iterative)
 
 **User Manual: Using The Sudoku Solver**
+
 **Description:** This is a Sudoku Solver that requires a minimum of 17 clues. If there is a valid unique solution, the solver will provide it and show the execution time and estimated space used. The solver is capable of receiving input for an unsolved board and clearing the board. Follow these steps to ensure a smooth experience with the solver.
 When you first start up the solver, it should look like this:
 
 
 **To Enter a Sudoku Puzzle**
+
 **Inputting Numbers:**
 - Click on any cell in the grid to select it.
 - Type a single digit (1-9) to input the number into the cell.
@@ -18,6 +20,7 @@ When you first start up the solver, it should look like this:
 - Use the arrow keys on your keyboard to move between cells quickly or click each cell individually.
 
 **Solving the Puzzle**
+
 **Starting the Solver**
 - Once the puzzle has been inputted, click the green “Solve” button located below the grid.
 - After the button has been pressed, the solver will use advanced algorithms to finish the puzzle in real time.
@@ -25,6 +28,7 @@ When you first start up the solver, it should look like this:
 - If the puzzle has no solution, a message will pop up stating there is no solution.
 
 **Clearing the Board**
+
 **Resetting the Grid**
 - Click the red “Clear Board” button to erase all entries and reset the grid and the statistics to its initial state.
 - This should be used when you would like to start over and input a new puzzle.
