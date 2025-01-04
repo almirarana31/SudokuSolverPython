@@ -186,8 +186,7 @@ def navigate(event):
         current_col = (current_col + 1) % 9
     entries[current_row][current_col].focus_set()
 
-
-# GUI
+# GUI setup
 root = tk.Tk()
 root.title("Sudoku Solver")
 root.geometry("650x760")
