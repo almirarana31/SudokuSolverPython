@@ -5,7 +5,7 @@ Sudoku Solver Backtracking Development (From Recursive to Iterative)
 
 **Description:** This is a Sudoku Solver that requires a minimum of 17 clues. If there is a valid unique solution, the solver will provide it and show the execution time and estimated space used. The solver is capable of receiving input for an unsolved board and clearing the board. Follow these steps to ensure a smooth experience with the solver.
 When you first start up the solver, it should look like this:
-!(https://github.com/almirarana31/SudokuSolverPython/blob/main/initial state.png?raw=true)
+![initial state](https://github.com/user-attachments/assets/bf9e246f-dd26-4608-8365-7e78bafbc229)
 
 **To Enter a Sudoku Puzzle**
 
