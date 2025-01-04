@@ -256,7 +256,7 @@ def highlight_original_cells(entries, original_grid):
                 entries[i][j].config(bg="#DFF2FF")  # light blue for solved cells
                 entries[i][j].config(readonlybackground="#DFF2FF")
 
-# GUI
+# GUI setup
 root = tk.Tk()
 root.title("Sudoku Solver")
 root.geometry("650x760")
