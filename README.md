@@ -25,6 +25,6 @@ When you first start up the solver, it should look like this:
 - If the puzzle has no solution, a message will pop up stating there is no solution.
 
 **Clearing the Board**
-**Resetting the Grid **
+**Resetting the Grid**
 - Click the red “Clear Board” button to erase all entries and reset the grid and the statistics to its initial state.
 - This should be used when you would like to start over and input a new puzzle.
