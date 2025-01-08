@@ -39,7 +39,8 @@ When you first start up the solver, it should look like this:
 - After the button has been pressed, the solver will use advanced algorithms to finish the puzzle in real time.
 - If the puzzle is solvable, the solution will appear in the grid and previously filled cells will be highlighted for clarity.
   
-  ![solved board](https://github.com/user-attachments/assets/b2a7e572-5666-4c59-9d1d-d4c408414a63)
+ ![solved board](https://github.com/user-attachments/assets/43ff59fe-5cc7-4a0e-91bc-9f8cb4dc1cf0)
+
   
 - If the puzzle has no solution, a message will pop up stating there is no solution.
   
