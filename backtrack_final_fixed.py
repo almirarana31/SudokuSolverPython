@@ -3,6 +3,10 @@ from tkinter import messagebox
 import time
 import sys
 
+operations = 0  # counts recursive calls and validation checks
+max_recursion_depth = 0  # tracks the maximum recursion depth
+current_recursion_depth = 0 # tracks current depth
+
 def initialize_possibilities_bitmask(grid):
     # initialize possibilities with bitmasking
     possibilities = {}
@@ -34,53 +38,84 @@ def update_possibilities_bitmask(possibilities, row, col, num, action="remove"):
             elif action == "restore":
                 possibilities[(i, j)] |= (1 << (num - 1))  # restore to subgrid
 
-def solve_sudoku_iterative(grid):
-    # solver using iteration
-    possibilities = initialize_possibilities_bitmask(grid)
-    stack = []
-    operations = 0
+def is_valid_with_bitmask(row_mask, col_mask, subgrid_mask, row, col, num):
+    # check if placing number is valid
+    global operations
+    operations += 1  # Count as one validity check operation (worst-case operation)
+    subgrid_idx = (row // 3) * 3 + (col // 3)
+    mask = 1 << (num - 1)
+    return (row_mask[row] & mask) and (col_mask[col] & mask) and (subgrid_mask[subgrid_idx] & mask)
 
-    # update grid from the initial state
+def solve_sudoku_recursive_with_bitmask(grid):
+    # main solving function
+    global operations, current_recursion_depth, max_recursion_depth
+
+    row_mask = [0b111111111 for _ in range(9)]
+    col_mask = [0b111111111 for _ in range(9)]
+    subgrid_mask = [0b111111111 for _ in range(9)]
+
+    def place_number_with_bitmask(row, col, num):
+        subgrid_idx = (row // 3) * 3 + (col // 3)
+        mask = 1 << (num - 1)
+        row_mask[row] &= ~mask
+        col_mask[col] &= ~mask
+        subgrid_mask[subgrid_idx] &= ~mask
+        grid[row][col] = num
+
+    def remove_number_with_bitmask(row, col, num):
+        subgrid_idx = (row // 3) * 3 + (col // 3)
+        mask = 1 << (num - 1)
+        row_mask[row] |= mask
+        col_mask[col] |= mask
+        subgrid_mask[subgrid_idx] |= mask
+        grid[row][col] = 0
+
+    def backtrack():
+        # recursive backtracking
+        global operations, current_recursion_depth, max_recursion_depth
+
+        current_recursion_depth += 1
+        max_recursion_depth = max(max_recursion_depth, current_recursion_depth)
+
+        # find next empty cell
+        for row in range(9):
+            for col in range(9):
+                if grid[row][col] == 0:
+                    for num in range(1, 10):
+                        operations += 1  #count each backtracking attempt (worst-case operation)
+                        if is_valid_with_bitmask(row_mask, col_mask, subgrid_mask, row, col, num):
+                            place_number_with_bitmask(row, col, num)
+                            if backtrack():
+                                return True
+                            remove_number_with_bitmask(row, col, num)
+
+                    current_recursion_depth -= 1
+                    return False
+
+        current_recursion_depth -= 1
+        return True
+
+    # initialize bitmasks based on the given grid
     for row in range(9):
         for col in range(9):
-            if grid[row][col] == 0:
-                stack.append((row, col, possibilities[(row, col)]))
+            if grid[row][col] != 0:
+                num = grid[row][col]
+                place_number_with_bitmask(row, col, num)
 
-    while stack:
-        row, col, bitmask = stack.pop()
+    # reset tracking variables
+    current_recursion_depth = 0
+    max_recursion_depth = 0
 
-        if grid[row][col] != 0:  # cell thats already filled
-            continue
+    solved = backtrack()
+    return solved, row_mask, col_mask, subgrid_mask
 
-        found_valid_number = False
-        for num in range(1, 10):
-            if bitmask & (1 << (num - 1)):  # check if number is valid
-                grid[row][col] = num
-                operations += 1
-                update_possibilities_bitmask(possibilities, row, col, num, action="remove")
-                # add the next empty cell
-                next_cell_found = False
-                for next_row in range(9):
-                    for next_col in range(9):
-                        if grid[next_row][next_col] == 0:
-                            stack.append((next_row, next_col, possibilities[(next_row, next_col)]))
-                            next_cell_found = True
-                            break
-                    if next_cell_found:
-                        break
-
-                found_valid_number = True
-                break
-
-        if not found_valid_number:
-            grid[row][col] = 0 # backtrack
-            if num > 0:  # only restore if actually tried a number
-                update_possibilities_bitmask(possibilities, row, col, num, action="restore")
-
-    return all(grid[row][col] != 0 for row in range(9) for col in range(9)), possibilities, operations
 
 def solve_sudoku_gui():
-    # solve sudoku and update GUI
+    # solve and update GUI
+    global operations
+    operations = 0
+
+    # read the grid from the GUI
     grid_copy = []
     original_grid = []
     filled_cells = 0
@@ -114,7 +149,7 @@ def solve_sudoku_gui():
         grid_copy.append(row)
         original_grid.append(original_row)
 
-    # check for minimum 17 clues
+    # check for a minimum of 17 clues
     if filled_cells < 17:
         messagebox.showerror(
             "Insufficient Clues",
@@ -122,7 +157,7 @@ def solve_sudoku_gui():
         )
         return
 
-    # check for duplicates
+    # check for duplicates in the grid
     if has_duplicates(grid_copy):
         messagebox.showerror(
             "Invalid Grid",
@@ -132,7 +167,7 @@ def solve_sudoku_gui():
 
     # start the solving process
     start_time = time.time()
-    solved, possibilities, operations = solve_sudoku_iterative(grid_copy)
+    solved, row_mask, col_mask, subgrid_mask = solve_sudoku_recursive_with_bitmask(grid_copy)  # Use the recursive bitmasking solver
     end_time = time.time()
 
     if solved:
@@ -144,13 +179,21 @@ def solve_sudoku_gui():
                 entries[i][j].insert(0, str(grid_copy[i][j]))
                 entries[i][j].config(state="readonly")
 
+        # highlight the original cells in a different color
         highlight_original_cells(entries, original_grid)
 
+        # display solving statistics
         time_taken = end_time - start_time
-        space_complexity = sys.getsizeof(grid_copy) + sys.getsizeof(possibilities)
+        space_complexity = (
+                sys.getsizeof(grid_copy) +
+                sys.getsizeof(row_mask) +
+                sys.getsizeof(col_mask) +
+                sys.getsizeof(subgrid_mask)
+        )
         display_statistics(operations, time_taken, filled_cells, 81 - filled_cells, space_complexity)
     else:
         messagebox.showerror("No Solution", "This puzzle has no valid solution!")
+
 
 def clear_board():
     # clear board reset stats
